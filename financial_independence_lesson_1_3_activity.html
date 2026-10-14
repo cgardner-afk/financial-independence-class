@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1.3 — Financial Independence Equation</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#18263a;background:#f4f7fb}*{box-sizing:border-box}body{margin:0;padding:22px}.wrap{max-width:760px;margin:auto;background:white;border:1px solid #dce4ee;border-radius:16px;padding:26px;box-shadow:0 4px 20px #1020380a}h1{font-size:1.65rem;margin:0 0 8px}p{line-height:1.55;color:#43546a}.field{margin:20px 0}label{display:block;font-weight:700;margin-bottom:8px}input[type=number],textarea{width:100%;padding:12px;border:1px solid #aebcd0;border-radius:8px;font:inherit}input[type=range]{width:100%;accent-color:#146e59}.rate{display:flex;justify-content:space-between}.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.tile{background:#eef3f8;padding:18px;border-radius:12px}.tile small{display:block;color:#45576e;margin-bottom:8px}.tile strong{font-size:1.5rem;overflow-wrap:anywhere}.warning{color:#9a321f;background:#fff0eb;padding:12px;border-radius:8px}.note{font-size:.88rem;color:#57677b}.question{font-weight:700;color:#18263a}textarea{min-height:135px;resize:vertical}button{background:#155e75;color:white;border:0;border-radius:9px;padding:13px 18px;font:inherit;font-weight:700;cursor:pointer}button:hover{background:#0e475a}.buttons{display:flex;flex-wrap:wrap;gap:10px}button.secondary{background:#e8edf3;color:#172b42}.status{min-height:1.4em;font-size:.9rem;color:#136047}@media(max-width:480px){body{padding:8px}.wrap{padding:17px}.results{gap:8px}.tile{padding:12px}.tile strong{font-size:1.2rem}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<h1>Lesson 1.3: Build Your Financial Independence Equation</h1>
+<p>Imagine you are 25 years old, working full-time, and paying your own living expenses. Change the values to see how income, spending, and the assumed withdrawal rate affect your savings and financial independence target.</p>
+<div class="field"><label for="income">Monthly take-home income ($)</label><input id="income" type="number" min="0" step="50" value="5000"></div>
+<div class="field"><label for="expenses">Monthly expenses ($)</label><input id="expenses" type="number" min="0" step="50" value="3500"></div>
+<div class="field"><div class="rate"><label for="rate">Assumed initial withdrawal rate</label><strong id="rateText">4%</strong></div><input id="rate" type="range" min="2" max="6" step="0.5" value="4"><p class="note">A lower withdrawal rate results in a higher estimated portfolio target. No withdrawal rate guarantees investments will last.</p></div>
+<section class="results" aria-live="polite">
+<div class="tile"><small>Monthly savings</small><strong id="savings"></strong></div>
+<div class="tile"><small>Savings rate</small><strong id="savingsRate"></strong></div>
+<div class="tile"><small>Annual expenses</small><strong id="annual"></strong></div>
+<div class="tile"><small>FI portfolio target</small><strong id="target"></strong></div>
+</section>
+<p id="warning" class="warning" hidden></p>
+<h2>Reflection Activity</h2>
+<p>Experiment with the calculator by increasing and decreasing your monthly expenses. Then answer these questions in a complete paragraph.</p>
+<p class="question">How does reducing your monthly expenses affect both your savings rate and your financial independence target? Why might someone with a lower income become financially independent before someone who earns more money?</p>
+<label for="reflection">Your response</label><textarea id="reflection" placeholder="Write your response here..."></textarea>
+<div class="buttons" style="margin-top:18px"><button id="copy" type="button">Copy Completed Activity</button><button id="download" class="secondary" type="button">Download Responses (.txt)</button></div>
+<p id="status" class="status" role="status"></p>
+<p class="note">For educational purposes only. The calculation uses annual expenses ÷ initial withdrawal rate. It does not model inflation, investment losses, taxes on withdrawals, or the probability that funds will last.</p>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const dollars=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+const number=id=>Math.max(0,Number($(id).value)||0);
+function update(){const income=number('income'),expenses=number('expenses'),rate=Number($('rate').value),savings=income-expenses,percent=income>0?savings/income*100:0,annual=expenses*12,target=annual/(rate/100);$('rateText').textContent=rate+'%';$('savings').textContent=dollars(savings);$('savingsRate').textContent=percent.toFixed(1)+'%';$('annual').textContent=dollars(annual);$('target').textContent=dollars(target);$('warning').hidden=savings>=0;if(savings<0)$('warning').textContent='Your expenses exceed your income by '+dollars(-savings)+' per month. This is a deficit, not savings.';}
+function responseText(){const income=number('income'),expenses=number('expenses'),rate=Number($('rate').value),savings=income-expenses;return ['Financial Independence I — Lesson 1.3 Activity','',`Monthly take-home income: ${dollars(income)}`,`Monthly expenses: ${dollars(expenses)}`,`Monthly savings: ${dollars(savings)}`,`Savings rate: ${income>0?(savings/income*100).toFixed(1):'0.0'}%`,`Annual expenses: ${dollars(expenses*12)}`,`Assumed withdrawal rate: ${rate}%`,`Illustrative FI portfolio target: ${dollars(expenses*12/(rate/100))}`,'','Reflection:',$('reflection').value].join('\n');}
+['income','expenses','rate'].forEach(id=>$(id).addEventListener('input',update));
+$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(responseText());$('status').textContent='Copied! Paste your response into your Canvas assignment.';}catch(e){$('status').textContent='Copy was blocked by your browser. Use Download Responses instead.';}});
+$('download').addEventListener('click',()=>{const blob=new Blob([responseText()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='lesson-1-3-financial-activity.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('status').textContent='Your response file has been downloaded.';});
+update();
+})();
+</script>
+</body></html>
