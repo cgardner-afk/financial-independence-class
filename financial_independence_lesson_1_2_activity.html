@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesson 1.2 — Financial Independence Activity</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#182235;background:#f5f7fb}*{box-sizing:border-box}body{margin:0;padding:22px}.wrap{max-width:780px;margin:auto;background:white;border:1px solid #dbe2ec;border-radius:14px;padding:26px;box-shadow:0 3px 16px #17233b0c}h1{font-size:1.65rem;margin:0 0 8px}p{line-height:1.55}.muted{color:#526078}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.expense{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #edf0f4}.expense label{font-weight:500}.money{display:flex;align-items:center;border:1px solid #bac5d4;border-radius:7px;padding:0 10px;min-width:125px;max-width:145px}.money input{width:100%;padding:10px 4px;border:0;font-size:1rem;outline:none}.summary{background:#eef3f9;border-radius:10px;padding:16px;margin-top:18px}.summary small{display:block;color:#526078;margin-bottom:7px}.amount{font-size:1.55rem;font-weight:700}.target{margin-top:12px;background:#eaf5ee}.target .amount{font-size:2rem}textarea{width:100%;min-height:125px;padding:12px;border:1px solid #bac5d4;border-radius:8px;font:inherit;resize:vertical}button{background:#1759a7;color:white;border:0;border-radius:8px;padding:12px 18px;font-size:1rem;font-weight:600;cursor:pointer}button:hover{background:#10457f}.note{font-size:.88rem;color:#526078}.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}#status{font-size:.9rem;color:#175c33}@media(max-width:550px){body{padding:8px}.wrap{padding:17px}.grid{grid-template-columns:1fr}.expense{align-items:flex-start}.expense label{padding-top:10px}}
+</style>
+</head>
+<body><main class="wrap">
+<h1>Financial Activity: How Much Does Financial Freedom Cost?</h1>
+<p class="muted">Financial Independence I · Lesson 1.2</p>
+<p>Imagine you are 25 years old, living independently, and responsible for your own expenses. Change the hypothetical monthly amounts to create your own budget. The totals update automatically.</p>
+<section id="expenses" aria-label="Monthly expenses"></section>
+<div class="grid"><div class="summary"><small>MONTHLY EXPENSES</small><div id="monthly" class="amount" aria-live="polite">$0</div></div><div class="summary"><small>ANNUAL EXPENSES</small><div id="annual" class="amount" aria-live="polite">$0</div></div></div>
+<div class="summary target"><small>ILLUSTRATIVE PORTFOLIO TARGET AT 4% INITIAL WITHDRAWAL</small><div id="target" class="amount" aria-live="polite">$0</div><p class="note">Annual expenses ÷ 0.04. This is an educational estimate, not a guaranteed retirement target.</p></div>
+<h2>Reflection</h2><p>How could reducing one or two of your expenses affect the amount of money you would need to become financially independent? Which expenses would you be willing to reduce, and which would you want to prioritize?</p>
+<label for="reflection"><strong>Your response</strong></label><textarea id="reflection" placeholder="Explain your thinking in a complete paragraph..."></textarea>
+<div class="actions"><button id="copy" type="button">Copy completed activity</button><button id="print" type="button">Print / Save as PDF</button><span id="status" role="status"></span></div>
+<p class="note">Your work stays in this browser page until you copy or print it. This activity does not automatically submit grades or save answers in Canvas. Actual planning must consider taxes, inflation, investment risk, and unexpected expenses.</p>
+</main>
+<script>
+(function(){
+'use strict';
+const items=[['Housing (rent or mortgage)',1200],['Utilities and internet',200],['Food and groceries',400],['Transportation',350],['Insurance and health care',300],['Personal spending and entertainment',250],['Other expenses',200]];
+const holder=document.getElementById('expenses');
+items.forEach(([name,value],i)=>{const row=document.createElement('div');row.className='expense';const label=document.createElement('label');label.htmlFor='expense-'+i;label.textContent=name;const money=document.createElement('div');money.className='money';const dollar=document.createElement('span');dollar.textContent='$';const input=document.createElement('input');input.type='number';input.id='expense-'+i;input.min='0';input.step='1';input.value=value;input.setAttribute('aria-label',name+' monthly amount in dollars');input.addEventListener('input',update);money.append(dollar,input);row.append(label,money);holder.append(row)});
+const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+function values(){return items.map((item,i)=>{const raw=Number(document.getElementById('expense-'+i).value);return Number.isFinite(raw)?Math.max(0,raw):0})}
+function update(){const monthly=values().reduce((a,b)=>a+b,0);document.getElementById('monthly').textContent=fmt(monthly);document.getElementById('annual').textContent=fmt(monthly*12);document.getElementById('target').textContent=fmt(monthly*12/.04)}
+function report(){const amounts=values();const monthly=amounts.reduce((a,b)=>a+b,0);return 'Financial Independence I — Lesson 1.2 Activity\n\nMonthly budget:\n'+items.map(([name],i)=>name+': '+fmt(amounts[i])).join('\n')+'\n\nMonthly expenses: '+fmt(monthly)+'\nAnnual expenses: '+fmt(monthly*12)+'\nIllustrative portfolio target (4%): '+fmt(monthly*12/.04)+'\n\nReflection:\n'+document.getElementById('reflection').value}
+document.getElementById('copy').addEventListener('click',async()=>{const status=document.getElementById('status');try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(report())}else{const t=document.createElement('textarea');t.value=report();document.body.append(t);t.select();if(!document.execCommand('copy'))throw new Error('Copy unavailable');t.remove()}status.textContent='Copied! Paste your answers into Canvas.'}catch(e){status.textContent='Copy blocked by browser. Use Print / Save as PDF instead.'}});
+document.getElementById('print').addEventListener('click',()=>window.print());update();
+})();
+</script>
+</body></html>
