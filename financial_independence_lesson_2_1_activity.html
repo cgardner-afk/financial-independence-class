@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesson 2.1 — The $1,000 Happiness Challenge</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#172338;background:#f5f7fb}*{box-sizing:border-box}body{margin:0;padding:22px}.container{max-width:850px;margin:auto;background:#fff;border:1px solid #dce3ed;border-radius:16px;padding:28px;box-shadow:0 5px 24px #1b35500b}h1{font-size:1.7rem;margin:0 0 7px}h2{font-size:1.15rem;margin:25px 0 8px}p{line-height:1.55;color:#435269}.muted{font-size:.9rem;color:#607086}.summary{background:#f0f5fc;border-radius:12px;padding:20px;margin:20px 0}.remaining{font-size:2rem;font-weight:750;margin:5px 0}.track{height:12px;background:#dce4ed;border-radius:50px;overflow:hidden;margin:12px 0}.fill{height:100%;background:#238653;width:0%;transition:width .2s}.item{display:grid;grid-template-columns:1fr 135px;gap:16px;align-items:center;border-bottom:1px solid #e7ebf0;padding:16px 0}.item:last-child{border-bottom:0}.name{font-weight:650}.desc{font-size:.87rem;color:#657287;margin-top:4px}.amount{display:flex;align-items:center;gap:6px}.amount span{color:#657287}input[type=number]{width:100%;border:1px solid #c7d2e0;border-radius:8px;padding:11px;font:inherit}textarea{width:100%;border:1px solid #c7d2e0;border-radius:8px;padding:12px;min-height:105px;font:inherit;resize:vertical}textarea:focus,input:focus{outline:2px solid #9bbce9;outline-offset:1px}button{border:0;border-radius:9px;background:#245bb0;color:#fff;padding:12px 18px;font:600 1rem system-ui;cursor:pointer}button:hover{background:#18458d}button:disabled{background:#a8b5c7;cursor:not-allowed}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.status{font-weight:600;margin-top:12px}.error{color:#af2525}.ok{color:#207348}.notice{background:#fff8e8;border:1px solid #f0dcaa;border-radius:9px;padding:12px;margin-top:20px;font-size:.9rem;color:#6d5524}@media(max-width:500px){body{padding:8px}.container{padding:18px}.item{grid-template-columns:1fr 105px;gap:8px}h1{font-size:1.4rem}}
+</style>
+</head>
+<body><main class="container">
+<p class="muted">Financial Independence I · Unit 2 · Lesson 2.1</p>
+<h1>The $1,000 Happiness Challenge</h1>
+<p>Imagine you are 25 years old and receive an unexpected <strong>$1,000 bonus</strong> from your employer. Your regular monthly bills are already paid. Decide how to use the bonus in ways that reflect your values, happiness, and financial security.</p>
+<div class="summary" aria-live="polite"><div class="muted">Bonus remaining to allocate</div><div class="remaining" id="remaining">$0</div><div class="track"><div class="fill" id="fill"></div></div><div id="status" class="status"></div></div>
+<div id="categories"></div>
+<h2>Part 1: Explain Your Choices</h2><p>Which categories did you prioritize, and why? Explain how your choices reflect your values and how you expect them to contribute to your happiness.</p><textarea id="reason" placeholder="Explain your spending decisions..."></textarea>
+<h2>Part 2: Think About the Future</h2><p>Imagine you receive the same $1,000 bonus every year for the next ten years. How might your decisions affect your financial security and overall life satisfaction? Would you change how you allocate the money? Explain your reasoning.</p><textarea id="reflection" placeholder="Write your reflection here..."></textarea>
+<div class="buttons"><button id="copy" type="button">Copy Completed Activity</button><button id="download" type="button">Download My Responses</button></div>
+<p class="muted" id="feedback" role="status"></p><div class="notice">Allocate exactly $1,000 before submitting. There are no predetermined correct allocations; the purpose is to explain your choices thoughtfully. Your responses stay in this browser until you copy or download them; they are not automatically submitted to Canvas.</div>
+</main>
+<script>
+(()=>{'use strict';
+const budget=1000;
+const categories=[
+{id:'possessions',name:'Material Possessions',desc:'Clothing, electronics, furniture, and other items',value:150},
+{id:'experiences',name:'Experiences',desc:'Travel, concerts, hobbies, and activities',value:250},
+{id:'emergency',name:'Emergency Savings',desc:'Money reserved for unexpected expenses',value:300},
+{id:'investing',name:'Long-Term Investing',desc:'Money invested for future financial goals',value:200},
+{id:'giving',name:'Helping Others',desc:'Gifts, donations, and supporting people',value:100}
+];
+const $=id=>document.getElementById(id), fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(n);
+const container=$('categories');
+categories.forEach(c=>{const row=document.createElement('div');row.className='item';const left=document.createElement('div');const name=document.createElement('label');name.className='name';name.htmlFor=c.id;name.textContent=c.name;const desc=document.createElement('div');desc.className='desc';desc.textContent=c.desc;left.append(name,desc);const amount=document.createElement('div');amount.className='amount';const sign=document.createElement('span');sign.textContent='$';const input=document.createElement('input');input.type='number';input.min='0';input.max='1000';input.step='0.01';input.id=c.id;input.value=c.value;input.addEventListener('input',update);amount.append(sign,input);row.append(left,amount);container.append(row)});
+function read(){const amounts=categories.map(c=>Number($(c.id).value));const valid=amounts.every((v,i)=>$(categories[i].id).value.trim()!==''&&Number.isFinite(v)&&v>=0&&Math.round(v*100)===v*100);const cents=amounts.reduce((sum,v)=>sum+Math.round(v*100),0);return {amounts,valid,cents,complete:valid&&cents===budget*100}}
+function update(){const {valid,cents,complete}=read();const remaining=(budget*100-cents)/100;$('remaining').textContent=valid?fmt(remaining):'—';$('fill').style.width=valid?`${Math.min(100,Math.max(0,cents/(budget*100)*100))}%`:'0%';$('fill').style.background=cents>budget*100?'#bd3030':'#238653';$('status').textContent=!valid?'Enter valid nonnegative dollar amounts (up to two decimal places).':cents>budget*100?'You have allocated more than your $1,000 bonus.':cents<budget*100?'You still have money available to allocate.':'You have allocated the entire $1,000 bonus.';$('status').className='status '+(!valid||cents>budget*100?'error':complete?'ok':'');$('copy').disabled=!complete;$('download').disabled=!complete;$('feedback').textContent=''}
+function report(){const {amounts}=read();return `Financial Independence I — Lesson 2.1\nThe $1,000 Happiness Challenge\n\n${categories.map((c,i)=>`${c.name}: ${fmt(amounts[i])}`).join('\n')}\nTotal: ${fmt(amounts.reduce((s,v)=>s+v,0))}\n\nPart 1 — Explain Your Choices:\n${$('reason').value}\n\nPart 2 — Think About the Future:\n${$('reflection').value}\n`}
+$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(report());$('feedback').textContent='Copied! Paste your work into your Canvas submission.'}catch(e){const t=document.createElement('textarea');t.value=report();document.body.append(t);t.select();const ok=document.execCommand('copy');t.remove();$('feedback').textContent=ok?'Copied! Paste your work into Canvas.':'Copy was blocked. Use Download My Responses instead.'}});
+$('download').addEventListener('click',()=>{const blob=new Blob([report()],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='lesson_2_1_happiness_challenge.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('feedback').textContent='Your text file is ready to submit in Canvas.'});update();
+})();
+</script></body></html>
